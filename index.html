@@ -518,26 +518,26 @@ function renderBreadcrumb() {
 // ─────────────────────────────────────────
 // GRAPH HELPERS
 // ─────────────────────────────────────────
+// SharePoint site: precisionNJ3.sharepoint.com/sites/OfficeDocs
+const SITE_HOSTNAME = 'precisionNJ3.sharepoint.com';
+const SITE_PATH = '/sites/OfficeDocs';
+
 async function getDrive() {
   if (driveId) return driveId;
-  // Get the automation account's drive
-  const data = await graphGet(`/users/automation@precisionNJ.com/drive`);
-  driveId = data.id;
+  const data = await graphGet(`/sites/${SITE_HOSTNAME}:${SITE_PATH}:/drives`);
+  // Find the default Documents drive
+  const docsDrive = data.value.find(d => d.name === 'Documents');
+  if (!docsDrive) throw new Error('Documents drive not found in Office Docs site');
+  driveId = docsDrive.id;
   return driveId;
 }
 
 async function findJobsFolder() {
   if (jobsFolderId) return jobsFolderId;
   const drive = await getDrive();
-  // Search for _CURRENT JOBS folder
   const data = await graphGet(`/drives/${drive}/root/children`);
-  const docs = data.value.find(f => f.name === 'Documents' && f.folder);
-  if (!docs) throw new Error('Documents folder not found');
-  
-  const docsChildren = await graphGet(`/drives/${drive}/items/${docs.id}/children`);
-  const jobs = docsChildren.value.find(f => f.name === CONFIG.jobsFolder && f.folder);
-  if (!jobs) throw new Error(`"${CONFIG.jobsFolder}" folder not found`);
-  
+  const jobs = data.value.find(f => f.name === CONFIG.jobsFolder && f.folder);
+  if (!jobs) throw new Error(`${CONFIG.jobsFolder} folder not found in Documents`);
   jobsFolderId = jobs.id;
   return jobsFolderId;
 }
