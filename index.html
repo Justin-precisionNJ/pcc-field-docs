@@ -582,24 +582,28 @@ async function showJobs() {
     }
 
     // Parse job number from folder name like "580 Monroe Police Department (Tekcon)"
-    const html = `
+    const jobCards = jobs.map((job, i) => {
+      const match = job.name.match(/^(\d+)\s+(.+)/);
+      const num = match ? match[1] : '';
+      const name = match ? match[2] : job.name;
+      return `
+        <div class="job-card" data-idx="${i}">
+          <div>
+            ${num ? `<div class="job-number">JOB #${num}</div>` : ''}
+            <div class="job-name">${name}</div>
+          </div>
+          <div class="job-arrow">›</div>
+        </div>`;
+    }).join('');
+    document.getElementById('content').innerHTML = `
       <div class="section-title">${jobs.length} Active Jobs</div>
-      <div id="jobs-grid">
-        ${jobs.map(job => {
-          const match = job.name.match(/^(\d+)\s+(.+)/);
-          const num = match ? match[1] : '';
-          const name = match ? match[2] : job.name;
-          return `
-            <div class="job-card" onclick="showFolders('${job.id}', ${JSON.stringify(job.name).replace(/'/g, "\\'")})">
-              <div>
-                ${num ? `<div class="job-number">JOB #${num}</div>` : ''}
-                <div class="job-name">${name}</div>
-              </div>
-              <div class="job-arrow">›</div>
-            </div>`;
-        }).join('')}
-      </div>`;
-    document.getElementById('content').innerHTML = html;
+      <div id="jobs-grid">${jobCards}</div>`;
+    document.querySelectorAll('.job-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const i = parseInt(card.dataset.idx);
+        showFolders(jobs[i].id, jobs[i].name);
+      });
+    });
   } catch(e) {
     showError(e.message);
   }
