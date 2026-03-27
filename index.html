@@ -759,27 +759,9 @@ function init() {
   driveId = null;
   jobsFolderId = null;
 
-  const hasConfig = CONFIG.clientId && CONFIG.tenantId && CONFIG.clientSecret;
-  
-  document.getElementById('login-btn').style.display = hasConfig ? 'none' : 'block';
-  document.getElementById('logout-btn').style.display = hasConfig ? 'block' : 'none';
-  document.getElementById('auth-status').textContent = hasConfig ? 'automation@precisionNJ.com' : '';
-
-  if (hasConfig) {
-    showJobs();
-  } else {
-    navStack = [];
-    renderBreadcrumb();
-    document.getElementById('content').innerHTML = `
-      <div id="welcome">
-        <div class="welcome-logo">PCC<br><span>Field Docs</span></div>
-        <div class="welcome-sub">Access job drawings, RFIs, and submittals from the field</div>
-        <button class="welcome-btn" onclick="showConfig()">⚙ Set Up Access</button>
-      </div>`;
-  }
+  showJobs();
 }
 
-loadConfig();
 init();
 </script>
 </body>
