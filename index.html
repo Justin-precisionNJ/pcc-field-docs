@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PCC Field Docs</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;500;600&display=swap');
+
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #22263a;
+    --accent: #f5a623;
+    --accent2: #e8520a;
+    --text: #f0f2f8;
+    --text-muted: #7a8099;
+    --border: #2e3350;
+    --success: #2ecc71;
+    --danger: #e74c3c;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Barlow', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── Header ── */
+  header {
+    background: var(--surface);
+    border-bottom: 2px solid var(--accent);
+    padding: 0 20px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--text);
+  }
+  .logo span { color: var(--accent); }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  #auth-status {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  #login-btn, #logout-btn {
+    background: var(--accent);
+    color: #000;
+    border: none;
+    padding: 7px 16px;
+    border-radius: 4px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  #login-btn:hover { background: var(--accent2); color: #fff; }
+  #logout-btn { background: transparent; border: 1px solid var(--border); color: var(--text-muted); }
+  #logout-btn:hover { border-color: var(--danger); color: var(--danger); }
+
+  /* ── Breadcrumb ── */
+  #breadcrumb {
+    padding: 12px 20px;
+    font-size: 13px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    min-height: 40px;
+  }
+  .crumb {
+    cursor: pointer;
+    color: var(--accent);
+    transition: color 0.2s;
+  }
+  .crumb:hover { color: var(--text); }
+  .crumb-sep { color: var(--border); }
+  .crumb-current { color: var(--text-muted); cursor: default; }
+
+  /* ── Main content ── */
+  #main {
+    padding: 16px 20px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  /* ── Welcome / login screen ── */
+  #welcome {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    text-align: center;
+    gap: 20px;
+  }
+
+  .welcome-logo {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 56px;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .welcome-logo span { color: var(--accent); }
+
+  .welcome-sub {
+    color: var(--text-muted);
+    font-size: 16px;
+    max-width: 300px;
+  }
+
+  .welcome-btn {
+    background: var(--accent);
+    color: #000;
+    border: none;
+    padding: 14px 32px;
+    border-radius: 4px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 8px;
+  }
+  .welcome-btn:hover { background: var(--accent2); color: #fff; transform: translateY(-1px); }
+
+  /* ── Section title ── */
+  .section-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* ── Job cards ── */
+  #jobs-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .job-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.2s;
+    border-left: 3px solid transparent;
+  }
+  .job-card:hover {
+    border-color: var(--accent);
+    border-left-color: var(--accent);
+    background: var(--surface2);
+    transform: translateX(2px);
+  }
+
+  .job-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+
+  .job-number {
+    font-size: 12px;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+
+  .job-arrow {
+    color: var(--text-muted);
+    font-size: 18px;
+    transition: transform 0.2s;
+  }
+  .job-card:hover .job-arrow { transform: translateX(4px); color: var(--accent); }
+
+  /* ── Folder cards ── */
+  #folders-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+  }
+
+  .folder-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 20px 16px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.2s;
+    text-align: center;
+  }
+  .folder-card:hover {
+    border-color: var(--accent);
+    background: var(--surface2);
+    transform: translateY(-2px);
+  }
+
+  .folder-icon {
+    font-size: 36px;
+    line-height: 1;
+  }
+
+  .folder-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  .folder-count {
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  /* ── File list ── */
+  #files-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .file-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .file-item:hover {
+    border-color: var(--accent);
+    background: var(--surface2);
+  }
+
+  .file-icon {
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+
+  .file-info { flex: 1; min-width: 0; }
+
+  .file-name {
+    font-size: 15px;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .file-meta {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  .file-open {
+    color: var(--accent);
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* ── Loading / empty ── */
+  .loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    color: var(--text-muted);
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-muted);
+    font-size: 15px;
+  }
+
+  .error-box {
+    background: rgba(231, 76, 60, 0.1);
+    border: 1px solid var(--danger);
+    border-radius: 6px;
+    padding: 16px;
+    color: #ff8a80;
+    font-size: 14px;
+    margin-bottom: 16px;
+  }
+
+  /* ── Config panel ── */
+  #config-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px;
+    max-width: 480px;
+    margin: 40px auto;
+  }
+
+  #config-panel h2 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  #config-panel p {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+  }
+
+  .field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+
+  .field-group label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .field-group input {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 10px 12px;
+    color: var(--text);
+    font-size: 14px;
+    font-family: monospace;
+    transition: border-color 0.2s;
+  }
+  .field-group input:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  .save-btn {
+    background: var(--accent);
+    color: #000;
+    border: none;
+    padding: 11px 24px;
+    border-radius: 4px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 8px;
+    transition: background 0.2s;
+  }
+  .save-btn:hover { background: var(--accent2); color: #fff; }
+
+  .config-link {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-align: center;
+    margin-top: 10px;
+    cursor: pointer;
+  }
+  .config-link:hover { color: var(--accent); }
+
+  /* Mobile tweaks */
+  @media (max-width: 480px) {
+    header { padding: 0 14px; }
+    #main { padding: 12px 14px; }
+    #breadcrumb { padding: 10px 14px; }
+    .welcome-logo { font-size: 40px; }
+    #folders-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">PCC <span>Field Docs</span></div>
+  <div class="header-right">
+    <span id="auth-status"></span>
+    <button id="login-btn" onclick="showConfig()" style="display:none">⚙ Setup</button>
+    <button id="logout-btn" onclick="logout()" style="display:none">Sign Out</button>
+  </div>
+</header>
+
+<div id="breadcrumb"></div>
+
+<div id="main">
+  <div id="content"></div>
+</div>
+
+<script>
+// ─────────────────────────────────────────
+// CONFIG — loaded from localStorage
+// ─────────────────────────────────────────
+let CONFIG = {
+  clientId: '',
+  tenantId: '',
+  clientSecret: '',
+  jobsFolder: '_CURRENT JOBS'
+};
+
+function loadConfig() {
+  const saved = localStorage.getItem('pcc_config');
+  if (saved) CONFIG = { ...CONFIG, ...JSON.parse(saved) };
+}
+
+function saveConfig() {
+  CONFIG.clientId = document.getElementById('cfg-clientId').value.trim();
+  CONFIG.tenantId = document.getElementById('cfg-tenantId').value.trim();
+  CONFIG.clientSecret = document.getElementById('cfg-secret').value.trim();
+  CONFIG.jobsFolder = document.getElementById('cfg-folder').value.trim() || '_CURRENT JOBS';
+  localStorage.setItem('pcc_config', JSON.stringify(CONFIG));
+  init();
+}
+
+// ─────────────────────────────────────────
+// AUTH — client credentials flow
+// ─────────────────────────────────────────
+let accessToken = null;
+let tokenExpiry = 0;
+
+async function getToken() {
+  if (accessToken && Date.now() < tokenExpiry) return accessToken;
+  
+  const url = `https://login.microsoftonline.com/${CONFIG.tenantId}/oauth2/v2.0/token`;
+  const body = new URLSearchParams({
+    client_id: CONFIG.clientId,
+    client_secret: CONFIG.clientSecret,
+    scope: 'https://graph.microsoft.com/.default',
+    grant_type: 'client_credentials'
+  });
+
+  const res = await fetch(url, { method: 'POST', body });
+  if (!res.ok) throw new Error('Auth failed — check your credentials in Setup');
+  const data = await res.json();
+  accessToken = data.access_token;
+  tokenExpiry = Date.now() + (data.expires_in - 60) * 1000;
+  return accessToken;
+}
+
+async function graphGet(path) {
+  const token = await getToken();
+  const res = await fetch(`https://graph.microsoft.com/v1.0${path}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error?.message || `Graph error ${res.status}`);
+  }
+  return res.json();
+}
+
+// ─────────────────────────────────────────
+// NAVIGATION STATE
+// ─────────────────────────────────────────
+let navStack = []; // [{label, action}]
+let driveId = null;
+let jobsFolderId = null;
+
+function pushNav(label, action) {
+  navStack.push({ label, action });
+  renderBreadcrumb();
+}
+
+function goTo(index) {
+  navStack = navStack.slice(0, index + 1);
+  renderBreadcrumb();
+  navStack[navStack.length - 1].action();
+}
+
+function renderBreadcrumb() {
+  const el = document.getElementById('breadcrumb');
+  if (navStack.length === 0) { el.innerHTML = ''; return; }
+  
+  el.innerHTML = navStack.map((item, i) => {
+    if (i === navStack.length - 1) {
+      return `<span class="crumb-current">${item.label}</span>`;
+    }
+    return `<span class="crumb" onclick="goTo(${i})">${item.label}</span><span class="crumb-sep">›</span>`;
+  }).join('');
+}
+
+// ─────────────────────────────────────────
+// GRAPH HELPERS
+// ─────────────────────────────────────────
+async function getDrive() {
+  if (driveId) return driveId;
+  // Get the automation account's drive
+  const data = await graphGet(`/users/automation@precisionNJ.com/drive`);
+  driveId = data.id;
+  return driveId;
+}
+
+async function findJobsFolder() {
+  if (jobsFolderId) return jobsFolderId;
+  const drive = await getDrive();
+  // Search for _CURRENT JOBS folder
+  const data = await graphGet(`/drives/${drive}/root/children`);
+  const docs = data.value.find(f => f.name === 'Documents' && f.folder);
+  if (!docs) throw new Error('Documents folder not found');
+  
+  const docsChildren = await graphGet(`/drives/${drive}/items/${docs.id}/children`);
+  const jobs = docsChildren.value.find(f => f.name === CONFIG.jobsFolder && f.folder);
+  if (!jobs) throw new Error(`"${CONFIG.jobsFolder}" folder not found`);
+  
+  jobsFolderId = jobs.id;
+  return jobsFolderId;
+}
+
+async function getChildren(itemId) {
+  const drive = await getDrive();
+  const data = await graphGet(`/drives/${drive}/items/${itemId}/children?$orderby=name`);
+  return data.value;
+}
+
+// ─────────────────────────────────────────
+// VIEWS
+// ─────────────────────────────────────────
+function showLoading() {
+  document.getElementById('content').innerHTML = `
+    <div class="loading">
+      <div class="spinner"></div>
+      <div>Loading...</div>
+    </div>`;
+}
+
+function showError(msg) {
+  document.getElementById('content').innerHTML = `
+    <div class="error-box">⚠ ${msg}</div>
+    <div class="config-link" onclick="showConfig()">⚙ Open Setup to check credentials</div>`;
+}
+
+async function showJobs() {
+  showLoading();
+  navStack = [];
+  pushNav('Jobs', showJobs);
+  renderBreadcrumb();
+
+  try {
+    const folderId = await findJobsFolder();
+    const items = await getChildren(folderId);
+    const jobs = items.filter(i => i.folder);
+
+    if (jobs.length === 0) {
+      document.getElementById('content').innerHTML = `<div class="empty">No jobs found in ${CONFIG.jobsFolder}</div>`;
+      return;
+    }
+
+    // Parse job number from folder name like "580 Monroe Police Department (Tekcon)"
+    const html = `
+      <div class="section-title">${jobs.length} Active Jobs</div>
+      <div id="jobs-grid">
+        ${jobs.map(job => {
+          const match = job.name.match(/^(\d+)\s+(.+)/);
+          const num = match ? match[1] : '';
+          const name = match ? match[2] : job.name;
+          return `
+            <div class="job-card" onclick="showFolders('${job.id}', ${JSON.stringify(job.name).replace(/'/g, "\\'")})">
+              <div>
+                ${num ? `<div class="job-number">JOB #${num}</div>` : ''}
+                <div class="job-name">${name}</div>
+              </div>
+              <div class="job-arrow">›</div>
+            </div>`;
+        }).join('')}
+      </div>`;
+    document.getElementById('content').innerHTML = html;
+  } catch(e) {
+    showError(e.message);
+  }
+}
+
+async function showFolders(jobId, jobName) {
+  showLoading();
+  pushNav(jobName, () => showFolders(jobId, jobName));
+
+  const folderIcons = {
+    'Drawings': '📐',
+    'RFI\'s': '❓',
+    'RFIs': '❓',
+    'Submittals': '📋',
+    'Addendums': '📝',
+    'Job Photos': '📷',
+    'Extra Work Tickets': '🔧',
+  };
+
+  try {
+    const items = await getChildren(jobId);
+    const folders = items.filter(i => i.folder);
+
+    // Find the Field Docs subfolder — matches "Field Docs - Job ###" pattern
+    const fieldDocsFolder = folders.find(f => 
+      f.name.toLowerCase().startsWith('field docs')
+    );
+
+    // If Field Docs folder exists, navigate directly into it
+    // This ensures contract docs and other parent folder contents are never exposed
+    const targetId = fieldDocsFolder ? fieldDocsFolder.id : jobId;
+    const targetItems = fieldDocsFolder 
+      ? await getChildren(fieldDocsFolder.id)
+      : folders;
+
+    const displayFolders = targetItems.filter(i => i.folder);
+
+    if (displayFolders.length === 0) {
+      document.getElementById('content').innerHTML = `<div class="empty">No folders found in Field Docs</div>`;
+      return;
+    }
+
+    // Get file counts for each folder
+    const folderData = await Promise.all(displayFolders.map(async f => {
+      try {
+        const children = await getChildren(f.id);
+        return { ...f, count: children.length };
+      } catch { return { ...f, count: 0 }; }
+    }));
+
+    const html = `
+      <div class="section-title">Select Folder</div>
+      <div id="folders-grid">
+        ${folderData.map(f => `
+          <div class="folder-card" onclick="showFiles('${f.id}', ${JSON.stringify(f.name).replace(/'/g, "\\'")})">
+            <div class="folder-icon">${folderIcons[f.name] || '📁'}</div>
+            <div class="folder-name">${f.name}</div>
+            <div class="folder-count">${f.count} file${f.count !== 1 ? 's' : ''}</div>
+          </div>`).join('')}
+      </div>`;
+    document.getElementById('content').innerHTML = html;
+  } catch(e) {
+    showError(e.message);
+  }
+}
+
+async function showFiles(folderId, folderName) {
+  showLoading();
+  pushNav(folderName, () => showFiles(folderId, folderName));
+
+  const fileIcons = {
+    'pdf': '📄',
+    'jpg': '🖼', 'jpeg': '🖼', 'png': '🖼', 'heic': '🖼',
+    'dwg': '📐', 'dxf': '📐',
+    'xlsx': '📊', 'xls': '📊',
+    'docx': '📝', 'doc': '📝',
+  };
+
+  try {
+    const items = await getChildren(folderId);
+    const files = items.filter(i => !i.folder);
+
+    if (files.length === 0) {
+      document.getElementById('content').innerHTML = `<div class="empty">No files in this folder</div>`;
+      return;
+    }
+
+    const formatSize = bytes => {
+      if (!bytes) return '';
+      if (bytes < 1024) return `${bytes} B`;
+      if (bytes < 1024*1024) return `${(bytes/1024).toFixed(0)} KB`;
+      return `${(bytes/1024/1024).toFixed(1)} MB`;
+    };
+
+    const formatDate = str => {
+      if (!str) return '';
+      return new Date(str).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    };
+
+    const html = `
+      <div class="section-title">${files.length} File${files.length !== 1 ? 's' : ''}</div>
+      <div id="files-list">
+        ${files.map(f => {
+          const ext = f.name.split('.').pop().toLowerCase();
+          const icon = fileIcons[ext] || '📎';
+          const url = f.webUrl;
+          return `
+            <div class="file-item" onclick="window.open('${url}', '_blank')">
+              <div class="file-icon">${icon}</div>
+              <div class="file-info">
+                <div class="file-name">${f.name}</div>
+                <div class="file-meta">${formatSize(f.size)}${f.lastModifiedDateTime ? ' · ' + formatDate(f.lastModifiedDateTime) : ''}</div>
+              </div>
+              <div class="file-open">Open ›</div>
+            </div>`;
+        }).join('')}
+      </div>`;
+    document.getElementById('content').innerHTML = html;
+  } catch(e) {
+    showError(e.message);
+  }
+}
+
+// ─────────────────────────────────────────
+// CONFIG SCREEN
+// ─────────────────────────────────────────
+function showConfig() {
+  navStack = [];
+  renderBreadcrumb();
+  document.getElementById('content').innerHTML = `
+    <div id="config-panel">
+      <h2>⚙ App Setup</h2>
+      <p>Enter your Azure app credentials. These are stored locally on this device only.</p>
+      <div class="field-group">
+        <label>Application (Client) ID</label>
+        <input id="cfg-clientId" type="text" placeholder="8402b22e-..." value="${CONFIG.clientId}">
+      </div>
+      <div class="field-group">
+        <label>Directory (Tenant) ID</label>
+        <input id="cfg-tenantId" type="text" placeholder="7ca956c3-..." value="${CONFIG.tenantId}">
+      </div>
+      <div class="field-group">
+        <label>Client Secret Value</label>
+        <input id="cfg-secret" type="password" placeholder="Wdv8Q~..." value="${CONFIG.clientSecret}">
+      </div>
+      <div class="field-group">
+        <label>Jobs Folder Name</label>
+        <input id="cfg-folder" type="text" placeholder="_CURRENT JOBS" value="${CONFIG.jobsFolder}">
+      </div>
+      <button class="save-btn" onclick="saveConfig()">Save & Connect</button>
+      ${CONFIG.clientId ? `<div class="config-link" onclick="showJobs()">← Back to Jobs</div>` : ''}
+    </div>`;
+}
+
+function logout() {
+  accessToken = null;
+  tokenExpiry = 0;
+  driveId = null;
+  jobsFolderId = null;
+  showConfig();
+}
+
+// ─────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────
+function init() {
+  loadConfig();
+  accessToken = null;
+  driveId = null;
+  jobsFolderId = null;
+
+  const hasConfig = CONFIG.clientId && CONFIG.tenantId && CONFIG.clientSecret;
+  
+  document.getElementById('login-btn').style.display = hasConfig ? 'none' : 'block';
+  document.getElementById('logout-btn').style.display = hasConfig ? 'block' : 'none';
+  document.getElementById('auth-status').textContent = hasConfig ? 'automation@precisionNJ.com' : '';
+
+  if (hasConfig) {
+    showJobs();
+  } else {
+    navStack = [];
+    renderBreadcrumb();
+    document.getElementById('content').innerHTML = `
+      <div id="welcome">
+        <div class="welcome-logo">PCC<br><span>Field Docs</span></div>
+        <div class="welcome-sub">Access job drawings, RFIs, and submittals from the field</div>
+        <button class="welcome-btn" onclick="showConfig()">⚙ Set Up Access</button>
+      </div>`;
+  }
+}
+
+loadConfig();
+init();
+</script>
+</body>
+</html>
