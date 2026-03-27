@@ -705,9 +705,10 @@ async function showFiles(folderId, folderName) {
     document.querySelectorAll('.file-item').forEach(item => {
       item.addEventListener('click', () => {
         const i = parseInt(item.dataset.idx);
-        const driveId = await getDrive();
-        const fileUrl = `${WORKER_URL}?download=${files[i].id}&driveId=${driveId}`;
-        window.open(fileUrl, '_blank');
+        getDrive().then(driveId => {
+          const fileUrl = `${WORKER_URL}?download=${files[i].id}&driveId=${driveId}`;
+          window.open(fileUrl, '_blank');
+        });
       });
     });
   } catch(e) {
