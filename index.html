@@ -433,11 +433,7 @@
 
 <header>
   <div class="logo">PCC <span>Field Docs</span></div>
-  <div class="header-right">
-    <span id="auth-status"></span>
-    <button id="login-btn" onclick="showConfig()" style="display:none">⚙ Setup</button>
-    <button id="logout-btn" onclick="logout()" style="display:none">Sign Out</button>
-  </div>
+
 </header>
 
 <div id="breadcrumb"></div>
@@ -448,28 +444,11 @@
 
 <script>
 // ─────────────────────────────────────────
-// CONFIG — loaded from localStorage
+// CONFIG — hardcoded, auth handled by Cloudflare Worker
 // ─────────────────────────────────────────
-let CONFIG = {
-  clientId: '',
-  tenantId: '',
-  clientSecret: '',
-  jobsFolder: '_CURRENT JOBS'
-};
-
-function loadConfig() {
-  const saved = localStorage.getItem('pcc_config');
-  if (saved) CONFIG = { ...CONFIG, ...JSON.parse(saved) };
-}
-
-function saveConfig() {
-  CONFIG.clientId = document.getElementById('cfg-clientId').value.trim();
-  CONFIG.tenantId = document.getElementById('cfg-tenantId').value.trim();
-  CONFIG.clientSecret = document.getElementById('cfg-secret').value.trim();
-  CONFIG.jobsFolder = document.getElementById('cfg-folder').value.trim() || '_CURRENT JOBS';
-  localStorage.setItem('pcc_config', JSON.stringify(CONFIG));
-  init();
-}
+const CONFIG = { jobsFolder: '_CURRENT JOBS' };
+function loadConfig() {}
+function saveConfig() {}
 
 // ─────────────────────────────────────────
 // PROXY — routes through Cloudflare Worker
@@ -766,11 +745,9 @@ function showConfig() {
 }
 
 function logout() {
-  accessToken = null;
-  tokenExpiry = 0;
   driveId = null;
   jobsFolderId = null;
-  showConfig();
+  showJobs();
 }
 
 // ─────────────────────────────────────────
