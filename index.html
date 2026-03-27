@@ -611,12 +611,13 @@ async function showFolders(jobId, jobName) {
       f.name.toLowerCase().startsWith('field docs')
     );
 
-    // If Field Docs folder exists, navigate directly into it
-    // This ensures contract docs and other parent folder contents are never exposed
-    const targetId = fieldDocsFolder ? fieldDocsFolder.id : jobId;
-    const targetItems = fieldDocsFolder 
-      ? await getChildren(fieldDocsFolder.id)
-      : folders;
+    // Only show Field Docs subfolder — never expose parent folder contents
+    // If no Field Docs folder found, show nothing (older jobs may have different structure)
+    if (!fieldDocsFolder) {
+      document.getElementById('content').innerHTML = `<div class="empty">No Field Docs folder found for this job.</div>`;
+      return;
+    }
+    const targetItems = await getChildren(fieldDocsFolder.id);
 
     const displayFolders = targetItems.filter(i => i.folder);
 
