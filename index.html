@@ -472,35 +472,12 @@ function saveConfig() {
 }
 
 // ─────────────────────────────────────────
-// AUTH — client credentials flow
+// PROXY — routes through Cloudflare Worker
 // ─────────────────────────────────────────
-let accessToken = null;
-let tokenExpiry = 0;
-
-async function getToken() {
-  if (accessToken && Date.now() < tokenExpiry) return accessToken;
-  
-  const url = `https://login.microsoftonline.com/${CONFIG.tenantId}/oauth2/v2.0/token`;
-  const body = new URLSearchParams({
-    client_id: CONFIG.clientId,
-    client_secret: CONFIG.clientSecret,
-    scope: 'https://graph.microsoft.com/.default',
-    grant_type: 'client_credentials'
-  });
-
-  const res = await fetch(url, { method: 'POST', body });
-  if (!res.ok) throw new Error('Auth failed — check your credentials in Setup');
-  const data = await res.json();
-  accessToken = data.access_token;
-  tokenExpiry = Date.now() + (data.expires_in - 60) * 1000;
-  return accessToken;
-}
+const WORKER_URL = 'https://pcc-graph-proxy.justin-cb5.workers.dev';
 
 async function graphGet(path) {
-  const token = await getToken();
-  const res = await fetch(`https://graph.microsoft.com/v1.0${path}`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
+  const res = await fetch(`${WORKER_URL}?path=${encodeURIComponent(path)}`);
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.error?.message || `Graph error ${res.status}`);
