@@ -705,7 +705,8 @@ async function showFiles(folderId, folderName) {
     document.querySelectorAll('.file-item').forEach(item => {
       item.addEventListener('click', () => {
         const i = parseInt(item.dataset.idx);
-        window.open(files[i].webUrl, '_blank');
+        const url = files[i].webUrl + (files[i].webUrl.includes('?') ? '&' : '?') + 'web=1';
+        window.open(url, '_blank');
       });
     });
   } catch(e) {
