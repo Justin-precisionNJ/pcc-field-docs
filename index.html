@@ -654,17 +654,21 @@ async function showFolders(jobId, jobName) {
       } catch { return { ...f, count: 0 }; }
     }));
 
-    const html = `
+    const folderCards = folderData.map((f, i) => `
+        <div class="folder-card" data-idx="${i}">
+          <div class="folder-icon">${folderIcons[f.name] || '📁'}</div>
+          <div class="folder-name">${f.name}</div>
+          <div class="folder-count">${f.count} file${f.count !== 1 ? 's' : ''}</div>
+        </div>`).join('');
+    document.getElementById('content').innerHTML = `
       <div class="section-title">Select Folder</div>
-      <div id="folders-grid">
-        ${folderData.map(f => `
-          <div class="folder-card" onclick="showFiles('${f.id}', ${JSON.stringify(f.name).replace(/'/g, "\\'")})">
-            <div class="folder-icon">${folderIcons[f.name] || '📁'}</div>
-            <div class="folder-name">${f.name}</div>
-            <div class="folder-count">${f.count} file${f.count !== 1 ? 's' : ''}</div>
-          </div>`).join('')}
-      </div>`;
-    document.getElementById('content').innerHTML = html;
+      <div id="folders-grid">${folderCards}</div>`;
+    document.querySelectorAll('.folder-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const i = parseInt(card.dataset.idx);
+        showFiles(folderData[i].id, folderData[i].name);
+      });
+    });
   } catch(e) {
     showError(e.message);
   }
@@ -703,25 +707,28 @@ async function showFiles(folderId, folderName) {
       return new Date(str).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     };
 
-    const html = `
+    const fileItems = files.map((f, i) => {
+      const ext = f.name.split('.').pop().toLowerCase();
+      const icon = fileIcons[ext] || '📎';
+      return `
+        <div class="file-item" data-idx="${i}">
+          <div class="file-icon">${icon}</div>
+          <div class="file-info">
+            <div class="file-name">${f.name}</div>
+            <div class="file-meta">${formatSize(f.size)}${f.lastModifiedDateTime ? ' · ' + formatDate(f.lastModifiedDateTime) : ''}</div>
+          </div>
+          <div class="file-open">Open ›</div>
+        </div>`;
+    }).join('');
+    document.getElementById('content').innerHTML = `
       <div class="section-title">${files.length} File${files.length !== 1 ? 's' : ''}</div>
-      <div id="files-list">
-        ${files.map(f => {
-          const ext = f.name.split('.').pop().toLowerCase();
-          const icon = fileIcons[ext] || '📎';
-          const url = f.webUrl;
-          return `
-            <div class="file-item" onclick="window.open('${url}', '_blank')">
-              <div class="file-icon">${icon}</div>
-              <div class="file-info">
-                <div class="file-name">${f.name}</div>
-                <div class="file-meta">${formatSize(f.size)}${f.lastModifiedDateTime ? ' · ' + formatDate(f.lastModifiedDateTime) : ''}</div>
-              </div>
-              <div class="file-open">Open ›</div>
-            </div>`;
-        }).join('')}
-      </div>`;
-    document.getElementById('content').innerHTML = html;
+      <div id="files-list">${fileItems}</div>`;
+    document.querySelectorAll('.file-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const i = parseInt(item.dataset.idx);
+        window.open(files[i].webUrl, '_blank');
+      });
+    });
   } catch(e) {
     showError(e.message);
   }
